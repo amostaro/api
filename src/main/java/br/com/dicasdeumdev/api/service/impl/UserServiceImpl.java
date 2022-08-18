@@ -7,6 +7,8 @@ import br.com.dicasdeumdev.api.service.exception.UserNaoEncontradoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -19,5 +21,10 @@ public class UserServiceImpl implements UserService {
                 () -> new UserNaoEncontradoException("User não encontrado.")
         );
         return user;
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 }
