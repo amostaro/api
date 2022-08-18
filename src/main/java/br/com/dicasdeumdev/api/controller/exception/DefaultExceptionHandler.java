@@ -1,5 +1,6 @@
 package br.com.dicasdeumdev.api.controller.exception;
 
+import br.com.dicasdeumdev.api.service.exception.EmailJaCadastradoException;
 import br.com.dicasdeumdev.api.service.exception.UserNaoEncontradoException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,5 +22,16 @@ public class DefaultExceptionHandler {
                 request.getRequestURI()
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(EmailJaCadastradoException.class)
+    public ResponseEntity<DefaultError> emailJaCadastrado(EmailJaCadastradoException ejce, HttpServletRequest request) {
+        DefaultError error = new DefaultError(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                ejce.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 }
