@@ -123,7 +123,33 @@ class UserServiceImplTest {
     }
 
     @Test
-    void update() {
+    void whenUpdateThenReturnSuccess() {
+        when(userRepository.save(any())).thenReturn(user);
+
+        User response = userService.update(userDTO);
+
+        assertNotNull(response);
+
+        assertAll(
+                () -> assertEquals(User.class, response.getClass()),
+                () -> assertEquals(ID, response.getId()),
+                () -> assertEquals(NAME, response.getName()),
+                () -> assertEquals(EMAIL, response.getEmail()),
+                () -> assertEquals(SENHA, response.getSenha())
+        );
+    }
+
+    @Test
+    void whenUpdateThenReturnEmailJaCadastradoException() {
+        when(userRepository.findByEmail(anyString())).thenReturn(optionalUser);
+
+        try {
+            optionalUser.get().setId(2);
+            userService.update(userDTO);
+        } catch (Exception ex) {
+            assertEquals(EmailJaCadastradoException.class, ex.getClass());
+            assertEquals("Email já cadastrado no sistema.", ex.getMessage());
+        }
     }
 
     @Test
