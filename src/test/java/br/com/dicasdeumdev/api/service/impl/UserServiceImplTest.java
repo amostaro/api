@@ -3,6 +3,7 @@ package br.com.dicasdeumdev.api.service.impl;
 import br.com.dicasdeumdev.api.domain.User;
 import br.com.dicasdeumdev.api.domain.dto.UserDTO;
 import br.com.dicasdeumdev.api.repository.UserRepository;
+import br.com.dicasdeumdev.api.service.exception.UserNaoEncontradoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -56,6 +57,18 @@ class UserServiceImplTest {
         assertEquals(ID, response.getId());
         assertEquals(NAME, response.getName());
         assertEquals(EMAIL, response.getEmail());
+    }
+
+    @Test
+    void whenFindByIdThenReturnAnUserNaoEncontradoException() {
+        when(userRepository.findById(anyInt())).thenThrow(new UserNaoEncontradoException("User não encontrado."));
+
+        try {
+            userService.findById(ID);
+        } catch (Exception ex) {
+            assertEquals(UserNaoEncontradoException.class, ex.getClass());
+            assertEquals("User não encontrado.", ex.getMessage());
+        }
     }
 
     @Test
