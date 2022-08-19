@@ -160,6 +160,17 @@ class UserServiceImplTest {
         verify(userRepository, times(1)).deleteById(anyInt());
     }
 
+    @Test
+    void whenDeleteThenReturnUserNaoEncontradoException() {
+        when(userRepository.findById(anyInt())).thenThrow(new UserNaoEncontradoException("User não encontrado."));
+        try {
+            userService.delete(ID);
+        } catch (Exception ex) {
+            assertEquals(UserNaoEncontradoException.class, ex.getClass());
+            assertEquals("User não encontrado.", ex.getMessage());
+        }
+    }
+
     private void startUser() {
         user = new User(ID, NAME, EMAIL, SENHA);
         userDTO = new UserDTO(ID, NAME, EMAIL, SENHA);
