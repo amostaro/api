@@ -3,6 +3,7 @@ package br.com.dicasdeumdev.api.service.impl;
 import br.com.dicasdeumdev.api.domain.User;
 import br.com.dicasdeumdev.api.domain.dto.UserDTO;
 import br.com.dicasdeumdev.api.repository.UserRepository;
+import br.com.dicasdeumdev.api.service.exception.EmailJaCadastradoException;
 import br.com.dicasdeumdev.api.service.exception.UserNaoEncontradoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,9 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -54,10 +54,12 @@ class UserServiceImplTest {
 
         assertNotNull(response);
 
-        assertEquals(User.class, response.getClass());
-        assertEquals(ID, response.getId());
-        assertEquals(NAME, response.getName());
-        assertEquals(EMAIL, response.getEmail());
+        assertAll(
+                () -> assertEquals(User.class, response.getClass()),
+                () -> assertEquals(ID, response.getId()),
+                () -> assertEquals(NAME, response.getName()),
+                () -> assertEquals(EMAIL, response.getEmail())
+        );
     }
 
     @Test
@@ -80,16 +82,44 @@ class UserServiceImplTest {
 
         assertNotNull(response);
 
-        assertEquals(1, response.size());
-        assertEquals(User.class, response.get(0).getClass());
-        assertEquals(ID, response.get(0).getId());
-        assertEquals(NAME, response.get(0).getName());
-        assertEquals(EMAIL, response.get(0).getEmail());
-        assertEquals(SENHA, response.get(0).getSenha());
+        assertAll(
+                () -> assertEquals(1, response.size()),
+                () -> assertEquals(User.class, response.get(0).getClass()),
+                () -> assertEquals(ID, response.get(0).getId()),
+                () -> assertEquals(NAME, response.get(0).getName()),
+                () -> assertEquals(EMAIL, response.get(0).getEmail()),
+                () -> assertEquals(SENHA, response.get(0).getSenha())
+        );
     }
 
     @Test
-    void create() {
+    void whenCreateThenReturnSuccess() {
+        when(userRepository.save(any())).thenReturn(user);
+
+        User response = userService.create(userDTO);
+
+        assertNotNull(response);
+
+        assertAll(
+                () -> assertEquals(User.class, response.getClass()),
+                () -> assertEquals(ID, response.getId()),
+                () -> assertEquals(NAME, response.getName()),
+                () -> assertEquals(EMAIL, response.getEmail()),
+                () -> assertEquals(SENHA, response.getSenha())
+        );
+    }
+
+    @Test
+    void whenCreateThenReturnEmailJaCadastradoException() {
+        when(userRepository.findByEmail(anyString())).thenReturn(optionalUser);
+
+        try {
+            optionalUser.get().setId(2);
+            userService.create(userDTO);
+        } catch (Exception ex) {
+            assertEquals(EmailJaCadastradoException.class, ex.getClass());
+            assertEquals("Email já cadastrado no sistema.", ex.getMessage());
+        }
     }
 
     @Test
