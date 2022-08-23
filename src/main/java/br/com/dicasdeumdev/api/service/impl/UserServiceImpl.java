@@ -24,9 +24,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findById(Integer id) {
-        return userRepository.findById(id).orElseThrow(
-                () -> new UserNaoEncontradoException("User não encontrado.")
-        );
+        return userRepository.findById(id).orElseThrow(() -> new UserNaoEncontradoException("User não encontrado."));
     }
 
     @Override
